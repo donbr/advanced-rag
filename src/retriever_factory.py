@@ -153,8 +153,8 @@ def get_ensemble_retriever():
         "bm25": get_bm25_retriever(),
         "naive": get_naive_retriever(),
         "parent_doc": get_parent_document_retriever(),
-        # "contextual_compression": get_contextual_compression_retriever(), # Can be slow for ensemble
-        # "multi_query": get_multi_query_retriever() # Can be slow for ensemble
+        "contextual_compression": get_contextual_compression_retriever(), # Can be slow for ensemble
+        "multi_query": get_multi_query_retriever() # Can be slow for ensemble
         # "semantic": get_semantic_retriever()
     }
 

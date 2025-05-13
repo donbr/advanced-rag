@@ -11,11 +11,11 @@ This document explains the fundamental concepts and technologies used in the Adv
 ## 1. Retrieval Augmented Generation (RAG)
 
 **What is it?**
-Retrieval Augmented Generation (RAG) is a technique that enhances the capabilities of Large Language Models (LLMs) by connecting them to external knowledge sources. Instead of solely relying on the vast but static information learned during its training, an LLM coupled with RAG can access and utilize specific, up-to-date, or proprietary information to generate more accurate, relevant, and context-aware responses.
+Retrieval Augmented Generation (RAG) is a technique that enhances the capabilities of Large Language Models (LLMs) by connecting them to external knowledge sources. Instead of solely relying on the vast but static information learned during its training, an LLM coupled with RAG can access and utilize specific, up-to-date, or proprietary information to generate more accurate, relevant, and context-aware responses. As of 2025, RAG has evolved to include multimodal capabilities, enabling systems to retrieve and process not just text, but also images, videos, and structured data.
 
 **Simplified Flow:**
 1.  **User Question:** The user asks a question.
-2.  **Retrieval:** A "Retriever" component searches a specified knowledge base (e.g., a collection of documents) for information relevant to the question.
+2.  **Retrieval:** A "Retriever" component searches a specified knowledge base (e.g., a collection of documents, images, or structured data) for information relevant to the question.
 3.  **Augmentation:** The retrieved information (context) is combined with the original user question.
 4.  **Generation:** This combined input (question + context) is fed to an LLM.
 5.  **Answer:** The LLM generates an answer based on both the question and the provided context.
@@ -353,6 +353,9 @@ Different retrievers have distinct strengths and weaknesses. Here's a comparison
 | Parent Document | Provides broader context | May include irrelevant information | Questions needing full document context |
 | Ensemble | Combines strengths of multiple retrievers | More complex, potentially slower | General-purpose, balanced approach |
 | Semantic | Better chunk boundaries based on meaning | Experimental, may have inconsistent results | Narrative text, conceptual topics |
+| GraphRAG | Models complex relationships between entities | Requires graph database setup | Questions involving multi-hop reasoning |
+| Adaptive Retrieval | Dynamically adjusts based on query complexity | More complex implementation | Diverse question types in one system |
+| Multimodal | Processes text, images, and other data types | Higher infrastructure requirements | Questions involving multiple data formats |
 
 ### Example Scenarios and Best Retrievers
 
@@ -555,4 +558,10 @@ Try these exercises to deepen your understanding of RAG components:
 
 ## Next Steps
 
-Ready to explore more advanced concepts? Continue to [advanced_concepts.md](./advanced_concepts.md) for cutting-edge RAG techniques, optimizations, and advanced implementations. 
+Ready to explore more advanced concepts? Continue to [advanced_concepts.md](./advanced_concepts.md) for cutting-edge RAG techniques, optimizations, and advanced implementations.
+
+## References
+
+1. Lewis, P., Perez, E., Piktus, A., Petroni, F., Karpukhin, V., Goyal, N., Küttler, H., Lewis, M., Yih, W., Rocktäschel, T., Riedel, S., & Kiela, D. (2020). [Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks](https://arxiv.org/abs/2005.11401). In Advances in Neural Information Processing Systems 33 (NeurIPS 2020).
+2. Gao, L., Ma, X., Lin, J., & Callan, J. (2023). [Precise Zero-Shot Dense Retrieval without Relevance Labels](https://arxiv.org/abs/2212.10496). In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pp. 1776-1789.
+3. Asai, A., Wu, Z., Wang, Y., Sil, A., & Hajishirzi, H. (2024). [Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection](https://arxiv.org/abs/2310.11511). In International Conference on Learning Representations (ICLR 2024, Oral Presentation).

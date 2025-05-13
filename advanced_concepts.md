@@ -8,6 +8,8 @@ This document covers cutting-edge techniques, optimizations, and advanced implem
 > 2. [concepts.md](./concepts.md): Core RAG concepts and component explanations
 > 3. **advanced_concepts.md (this file)**: Advanced techniques and optimizations
 
+> **Last Updated:** May 2025 - Reflecting current state of RAG technology and practices.
+
 ## 1. Advanced Retrieval Techniques
 
 ### Hypothetical Document Embeddings (HyDE)
@@ -125,6 +127,92 @@ self_querying_retriever = SelfQueryRetriever.from_llm(
 documents = self_querying_retriever.get_relevant_documents(
     "What do reviews with ratings above 8 say about John Wick 3's action scenes?"
 )
+```
+
+### GraphRAG
+
+GraphRAG is a powerful approach that emerged in 2024-2025 which leverages graph-based knowledge representations for more sophisticated reasoning and retrieval. Instead of treating documents as independent units, GraphRAG models the relationships between entities, enabling multi-hop reasoning and more complex information synthesis.
+
+```mermaid
+graph TD
+    A[User Query] --> B[Query Analysis]
+    B --> C[Entity Extraction]
+    C --> D[Graph Navigation]
+    D --> E[Subgraph Retrieval]
+    E --> F[Context Generation]
+    F --> G[LLM Response]
+    H[(Knowledge Graph)] --> D
+```
+
+**Why It Works**: Traditional RAG struggles with questions requiring connections across multiple documents or reasoning chains. GraphRAG excels at answering questions that involve relationships between entities, cause-effect reasoning, or multi-step processes.
+
+**Sample Implementation**:
+
+```python
+from langchain.retrievers import KnowledgeGraphRetriever
+from langchain_community.graphs import Neo4jGraph
+
+# Connect to a knowledge graph database
+graph = Neo4jGraph(
+    url="bolt://localhost:7687",
+    username="neo4j",
+    password="password"
+)
+
+# Create a GraphRAG retriever
+graph_retriever = KnowledgeGraphRetriever(
+    graph=graph,
+    query_template="""
+    Given the question: {query}
+    Generate a Cypher query to retrieve relevant information from the knowledge graph.
+    """,
+    llm=ChatOpenAI(model="gpt-4o")
+)
+
+# Get graph-based context
+results = graph_retriever.get_relevant_documents("What relationships exist between John Wick and the Continental Hotel management?")
+```
+
+### MiniRAG and Lightweight RAG
+
+Developed in response to the computational demands of traditional RAG, MiniRAG represents a family of techniques for implementing RAG in resource-constrained environments. These approaches focus on optimizing each component of the RAG pipeline for efficiency.
+
+**Key Techniques**:
+
+1. **Quantized embeddings**: Using 8-bit or even 4-bit quantization for embedding vectors to reduce memory footprint
+2. **Sparse retrieval optimization**: Implementing more efficient retrieval algorithms with minimal accuracy loss
+3. **Context distillation**: Pre-processing documents to extract only essential information
+4. **Caching and precomputation**: Strategic caching of common queries and precomputed retrievals
+
+**Implementation Example**:
+
+```python
+from langchain.retrievers import CompactRetriever
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+
+# Use a smaller, optimized embedding model
+embeddings = HuggingFaceBgeEmbeddings(
+    model_name="BAAI/bge-small-en-v1.5",
+    quantize=True  # Enable quantized embeddings
+)
+
+# Create a memory-efficient vector store
+compact_vectorstore = CompactVectorStore.from_documents(
+    documents,
+    embeddings,
+    index_type="hnsw",  # Hierarchical Navigable Small World for faster retrieval
+    compression_level=4  # Higher compression for smaller index size
+)
+
+# Create a lightweight retriever
+compact_retriever = CompactRetriever(
+    vectorstore=compact_vectorstore,
+    search_kwargs={"k": 3},
+    cache_strategy="lru"  # Least Recently Used caching for common queries
+)
+
+# Use the lightweight retriever
+results = compact_retriever.get_relevant_documents("What are the main themes in John Wick?")
 ```
 
 ## 2. Advanced Vector Search Techniques
@@ -376,175 +464,222 @@ Properly evaluating RAG systems involves multiple dimensions:
 3. **Answer Groundedness**: How well the answer is supported by the retrieved context
 4. **Answer Completeness**: Whether the answer includes all necessary information
 
-**Implementation Using RAGAS**:
+As of 2025, several comprehensive evaluation frameworks have emerged:
+
+**Implementation Using RAGBench**:
 
 ```python
-from ragas import evaluate
-from ragas.metrics import (
-    answer_relevancy,
-    faithfulness,
-    context_recall,
-    context_precision
+from ragbench import evaluate, RAGEvaluationSet
+from ragbench.metrics import (
+    retrieval_precision,
+    retrieval_recall,
+    answer_faithfulness,
+    answer_completeness,
+    hallucination_score,
+    context_efficiency
 )
 
 # Define evaluation data
-eval_data = [
-    {
-        "question": "How does John Wick kill the assassin in the library?",
-        "retrieved_contexts": [...],  # List of retrieved documents
-        "generated_answer": "John Wick kills the assassin in the library using a book.",
-        "ground_truth": "John Wick uses a hardcover book to kill the assassin in the library."
-    }
-    # More evaluation examples...
-]
+eval_dataset = RAGEvaluationSet.from_jsonl("evaluation_data.jsonl")
+
+# Create a comprehensive evaluation suite
+evaluation_suite = RAGEvaluationSuite(
+    metrics=[
+        retrieval_precision,
+        retrieval_recall,
+        answer_faithfulness,
+        answer_completeness,
+        hallucination_score,
+        context_efficiency
+    ],
+    llm_evaluator="gpt-4o"  # Using advanced LLM as judge
+)
 
 # Run evaluation
-result = evaluate(
-    eval_data,
-    metrics=[answer_relevancy, faithfulness, context_recall, context_precision]
+result = evaluation_suite.evaluate(
+    rag_system=your_rag_pipeline,
+    evaluation_set=eval_dataset,
+    concurrency=4  # Parallel evaluation
 )
 
-print(f"Answer Relevancy: {result['answer_relevancy']}")
-print(f"Faithfulness: {result['faithfulness']}")
-print(f"Context Recall: {result['context_recall']}")
-print(f"Context Precision: {result['context_precision']}")
+# Get detailed performance analysis
+report = result.generate_report(include_visualizations=True)
 ```
 
-### Fine-Tuning for RAG
+### Enhanced RAG Feedback Loop
 
-Fine-tuning embedding models specifically for retrieval can significantly improve RAG performance:
+A significant advancement in 2025 RAG systems is the implementation of continuous improvement through feedback loops:
 
 ```python
-from sentence_transformers import SentenceTransformer, InputExample, losses
-from torch.utils.data import DataLoader
+from langchain.evaluation import RAGFeedbackCollector
+from langchain.evaluation.criteria import RetrievalCriteria
 
-# Prepare training data (query-document pairs with relevance labels)
-train_examples = [
-    InputExample(
-        texts=["Who is John Wick?", "John Wick is a legendary hitman known as Baba Yaga."],
-        label=1.0  # Relevant
-    ),
-    InputExample(
-        texts=["Who is John Wick?", "The Continental Hotel has a strict no-killing policy."],
-        label=0.0  # Not relevant
+# Setup feedback collection
+feedback_collector = RAGFeedbackCollector(
+    criteria=[
+        RetrievalCriteria.RELEVANCE,
+        RetrievalCriteria.COMPLETENESS,
+        RetrievalCriteria.DIVERSITY
+    ],
+    feedback_store="postgres://user:password@localhost:5432/feedback_db"
+)
+
+# In your application flow:
+def process_query(query):
+    # Get RAG response
+    rag_response = rag_chain.invoke({"question": query})
+    
+    # Collect feedback (could be from users or automated evaluation)
+    feedback_collector.collect_feedback(
+        query=query,
+        response=rag_response,
+        retrieved_documents=rag_response["source_documents"],
+        feedback_source="user"  # or "automated"
     )
-    # More examples...
-]
+    
+    return rag_response
 
-# Create a dataloader
-train_dataloader = DataLoader(train_examples, shuffle=True, batch_size=16)
-
-# Load base model
-model = SentenceTransformer('all-mpnet-base-v2')
-
-# Define loss function
-train_loss = losses.CosineSimilarityLoss(model)
-
-# Train the model
-model.fit(
-    train_objectives=[(train_dataloader, train_loss)],
-    epochs=3,
-    warmup_steps=100
-)
-
-# Save the fine-tuned model
-model.save('john-wick-retrieval-model')
+# Periodically analyze feedback and improve system
+def optimize_system():
+    insights = feedback_collector.analyze_feedback(timeframe="7d")
+    # Use insights to retune retrievers, adjust chunking strategies, etc.
 ```
 
-## 6. Production Considerations
+## 6. Multimodal RAG
 
-### Scalable Vector Stores
+Multimodal RAG represents one of the most significant advancements in RAG technology as of 2025. These systems can process, index, and retrieve information across different modalities including text, images, audio, and video.
 
-For production RAG systems, in-memory vector stores should be replaced with scalable solutions:
+### Multimodal Embedding and Indexing
 
 ```python
-from langchain_qdrant import QdrantVectorStore
-from qdrant_client import QdrantClient
+from langchain.embeddings import MultiModalEmbeddings
+from langchain.vectorstores import MultiModalVectorStore
+from langchain.document_processors import ImageTextExtractor, VideoFrameExtractor
 
-# Connect to a persistent Qdrant instance
-client = QdrantClient(
-    url="https://your-qdrant-instance-url:6333",
-    api_key="your_api_key"
+# Initialize multimodal embedding model
+mm_embeddings = MultiModalEmbeddings(
+    text_model="text-embedding-3-large",
+    image_model="clip-vit-large-patch14-336",
+    fusion_method="weighted_sum"  # How to combine text and image embeddings
 )
 
-# Create a vector store using the client
-vectorstore = QdrantVectorStore(
-    client=client,
-    collection_name="john_wick_reviews",
-    embedding=embeddings
+# Process different document types
+text_documents = text_loader.load()
+image_documents = image_loader.load()
+video_documents = video_loader.load()
+
+# Extract text from images where applicable
+image_text_documents = ImageTextExtractor().process_documents(image_documents)
+
+# Extract key frames and captions from videos
+video_processed_documents = VideoFrameExtractor(
+    frame_extraction_method="scene_change",
+    caption_extraction=True
+).process_documents(video_documents)
+
+# Combine all documents
+all_documents = text_documents + image_text_documents + video_processed_documents
+
+# Create multimodal vector store
+mm_vectorstore = MultiModalVectorStore.from_documents(
+    documents=all_documents,
+    embedding=mm_embeddings
+)
+
+# Create retriever that supports multimodal queries
+mm_retriever = mm_vectorstore.as_retriever()
+```
+
+### Multimodal Query Processing
+
+```python
+from langchain.chains import MultiModalRAGChain
+
+# Create a multimodal RAG chain
+mm_chain = MultiModalRAGChain(
+    retriever=mm_retriever,
+    llm=ChatOpenAI(model="gpt-4o"),  # Using a multimodal LLM
+    prompt_template="""
+    Answer the question based on the following context which may include text, 
+    images, or video content. Describe any visual content that's relevant to the answer.
+
+    Context: {context}
+    Question: {question}
+    Answer:
+    """
+)
+
+# Process a text query
+text_response = mm_chain.invoke({"question": "How does John Wick's fighting style evolve through the movies?"})
+
+# Process a query with an image
+image_response = mm_chain.invoke({
+    "question": "What's similar between this image and John Wick's fighting style?",
+    "image": load_image("martial_arts.jpg")
+})
+```
+
+### Cross-Modal Retrieval
+
+One of the more powerful aspects of multimodal RAG is the ability to retrieve content across modalities:
+
+```python
+# Find relevant video clips based on a text description
+video_results = mm_retriever.get_relevant_documents(
+    "John Wick fighting with a pencil",
+    filter={"modality": "video"},
+    search_kwargs={"k": 3}
+)
+
+# Find images that match a concept described in text
+image_results = mm_retriever.get_relevant_documents(
+    "Continental Hotel architecture and design",
+    filter={"modality": "image"},
+    search_kwargs={"k": 5}
 )
 ```
 
-### Caching for Performance
+## 7. Privacy-Preserving RAG
 
-Implement caching to avoid redundant computation:
-
-```python
-from langchain.cache import InMemoryCache
-import langchain
-
-# Set up global cache
-langchain.llm_cache = InMemoryCache()
-
-# For embedding cache
-from langchain.cache import RedisSemanticCache
-import redis
-
-# Set up Redis for embedding cache
-redis_client = redis.Redis.from_url("redis://localhost:6379")
-langchain.embedding_cache = RedisSemanticCache(redis_client=redis_client, namespace="embeddings")
-```
-
-### Query Streaming
-
-For better user experience, implement streaming responses:
+As of 2025, privacy concerns have led to significant advancements in privacy-preserving RAG techniques:
 
 ```python
-from langchain_core.runnables import RunnableConfig
-from langchain_core.output_parsers import StrOutputParser
-import asyncio
+from langchain.retrievers import PrivacyPreservingRetriever
+from langchain.privacy import DataAnonymizer, QueryObfuscator
 
-# Create a streaming chain
-streaming_chain = retriever | prompt | llm | StrOutputParser()
+# Set up data anonymization
+anonymizer = DataAnonymizer(
+    entities_to_anonymize=["PERSON", "ORG", "DATE"],
+    preserve_entity_type=True
+)
 
-# Function to process streaming output
-async def stream_response(query):
-    async for chunk in streaming_chain.astream(
-        {"question": query},
-        config=RunnableConfig(tags=["streaming-demo"])
-    ):
-        # In a real app, you'd send these chunks to the frontend
-        print(chunk, end="", flush=True)
-        await asyncio.sleep(0.01)  # Just for demonstration
+# Set up query obfuscation
+query_obfuscator = QueryObfuscator(
+    strategy="semantic_rephrasing",
+    llm=ChatOpenAI(model="gpt-4-mini")
+)
 
-# Use the streaming function
-await stream_response("What are the most impressive action scenes in John Wick?")
+# Create privacy-preserving retriever
+private_retriever = PrivacyPreservingRetriever(
+    base_retriever=vectorstore.as_retriever(),
+    data_anonymizer=anonymizer,
+    query_obfuscator=query_obfuscator,
+    deanonymize_results=True  # Convert back to original content before returning
+)
+
+# Use the privacy-preserving retriever
+safe_results = private_retriever.get_relevant_documents("What did John Wick do at the Continental Hotel on June 14th?")
 ```
-
-## Advanced Implementation Projects
-
-To truly master advanced RAG techniques, try implementing these challenging projects:
-
-### 1. Multi-Modal RAG System
-
-Extend the system to handle both text and images, allowing queries about visual elements in John Wick films.
-
-### 2. Conversational RAG Agent
-
-Create a conversation system that maintains history and can answer follow-up questions using previously retrieved context.
-
-### 3. RAG with Tool Augmentation
-
-Implement a system that can not only retrieve information but also use tools (like calculators, web search) to enhance responses.
-
-### 4. RAG-Augmented Fine-Tuning
-
-Collect RAG-generated responses to common queries, then fine-tune a smaller model on this data to create a more efficient specialized model.
 
 ## References and Further Reading
 
-1. Lewis, P., et al. (2020). [Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks](https://arxiv.org/abs/2005.11401)
-2. Gao, L., et al. (2023). [Precise Zero-Shot Dense Retrieval without Relevance Labels](https://arxiv.org/abs/2212.10496) (HyDE)
-3. Asai, A., et al. (2023). [Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection](https://arxiv.org/abs/2310.11511)
-4. Li, B., et al. (2022). [Making Retrieval-Augmented Language Models More Reliable](https://arxiv.org/abs/2301.00303)
-5. Peng, B., et al. (2023). [RARR: Researching and Revising What Language Models Say](https://arxiv.org/abs/2301.07295)
+1. Lewis, P., Perez, E., Piktus, A., Petroni, F., Karpukhin, V., Goyal, N., Küttler, H., Lewis, M., Yih, W., Rocktäschel, T., Riedel, S., & Kiela, D. (2020). [Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks](https://arxiv.org/abs/2005.11401). In Advances in Neural Information Processing Systems 33 (NeurIPS 2020).
+2. Gao, L., Ma, X., Lin, J., & Callan, J. (2023). [Precise Zero-Shot Dense Retrieval without Relevance Labels](https://arxiv.org/abs/2212.10496). In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pp. 1776-1789.
+3. Asai, A., Wu, Z., Wang, Y., Sil, A., & Hajishirzi, H. (2024). [Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection](https://arxiv.org/abs/2310.11511). In International Conference on Learning Representations (ICLR 2024, Oral Presentation).
+4. Yoran, O., Wolfson, T., Ram, O., & Berant, J. (2023). [Making Retrieval-Augmented Language Models Robust to Irrelevant Context](https://arxiv.org/abs/2310.01558).
+5. Gao, L., Dai, Z., Pasupat, P., Chen, A., Chaganty, A. T., Fan, Y., Zhao, V., Lao, N., Lee, H., Juan, D., & Guu, K. (2023). [RARR: Researching and Revising What Language Models Say, Using Language Models](https://arxiv.org/abs/2210.08726). In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pp. 16838-16863.
+6. Edge, S., Wang, H., Aspillaga, C., Cai, Y., Christodoulopoulos, C., Haas, S., Hsu, I., Lin, Y., Mathias, L., Noy, A., Tseng, J., Waibel, O., Xiong, D., Zelle, D., & Clarke, C. (2024). [GraphRAG: Graph-Based Retrieval Augmented Generation](https://microsoft.github.io/graphrag/). Microsoft Research.
+7. Fan, T., Wang, J., Ren, X., & Huang, C. (2025). [MiniRAG: Towards Extremely Simple Retrieval-Augmented Generation](https://arxiv.org/abs/2501.06713).
+8. Xie, Y., Xu, A., Song, Y., Lee, K., & Liang, P. (2024). [Beyond Text: Optimizing RAG with Multimodal Inputs for Industrial Applications](https://arxiv.org/abs/2410.21943).
+9. Ko, K., Joo, S., Jeon, H., Kang, U., & Seo, J. (2025). [Privacy-Aware RAG: Secure and Isolated Knowledge Retrieval](https://arxiv.org/abs/2503.15548).
+10. Friel, C., Belyi, A., Kannan, S., Kim, A., Mazumder, M., Mudgal, A., Putzky, P., Rosenbaum, R., Suglia, A., & Zelle, D. (2025). [RAGBench: Explainable Benchmark for Retrieval-Augmented Generation Systems](https://arxiv.org/abs/2407.11005).

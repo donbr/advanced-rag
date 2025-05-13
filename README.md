@@ -10,6 +10,10 @@ By working with this project, you'll gain practical experience with:
 * Understanding different retrieval strategies and their respective strengths
 * Working with vector stores and embeddings in real applications
 * Implementing and testing FastAPI endpoints for LLM applications
+* Processing multimodal data (text, images, and structured data) in RAG pipelines
+* Creating feedback loops for continuous RAG system improvement
+* Implementing graph-based retrievers for complex reasoning tasks
+* Developing resource-efficient RAG solutions for constrained environments
 * Debugging and troubleshooting RAG components
 * Creating modular, maintainable AI application architectures
 
@@ -22,6 +26,8 @@ This project includes three main documents to guide your learning:
 3. **[advanced_concepts.md](./advanced_concepts.md)**: Advanced techniques, optimizations, and cutting-edge RAG approaches
 
 We recommend following this progression to build from fundamentals to advanced understanding.
+
+> **Last Updated:** May 2025 - Reflecting current best practices in RAG technology.
 
 ## Conceptual Overview
 
@@ -73,9 +79,13 @@ The system demonstrates multiple retrieval approaches (naive vector similarity, 
 1.  **Python 3.8+**
 2.  **PIP** (Python package installer)
 3.  **API Keys**:
-    *   OpenAI API Key
+    *   OpenAI API Key (for text and multimodal models)
     *   Cohere API Key
     *   LangSmith API Key (Optional, for tracing)
+4.  **Additional Dependencies for Multimodal Processing**:
+    *   CLIP or similar vision models for image processing
+    *   FFmpeg for video frame extraction (for multimodal examples)
+    *   Neo4j (for GraphRAG examples)
 
 ## Setup Instructions
 
@@ -121,6 +131,8 @@ The system demonstrates multiple retrieval approaches (naive vector similarity, 
 * **Memory errors with Qdrant**: If you encounter memory issues, try adjusting the number of documents processed by setting a limit in data_loader.py.
 * **Python version compatibility**: This code is tested with Python 3.8 through 3.11. Earlier or newer versions may require adjustments.
 * **Missing libomp error on macOS**: Install it with `brew install libomp` if you encounter this error.
+* **Multimodal dependencies**: For multimodal examples, ensure you have installed the necessary packages: `pip install pillow opencv-python transformers torch`.
+* **Neo4j connection issues**: For GraphRAG examples, make sure Neo4j is properly installed and accessible at the specified URL.
 
 ## Running the Application
 

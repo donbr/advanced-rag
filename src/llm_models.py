@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 def get_chat_model():
     logger.info("Initializing ChatOpenAI model (default: gpt-3.5-turbo)...")
     try:
-        model = ChatOpenAI() # Uses default model gpt-3.5-turbo
+        model = ChatOpenAI(model="gpt-4.1-nano")
         logger.info(f"ChatOpenAI model initialized successfully: {model.model_name}")
         return model
     except Exception as e:
@@ -28,11 +28,6 @@ if __name__ == "__main__":
         chat_model = get_chat_model()
         if chat_model:
             logger.info(f"Chat model type: {type(chat_model)}")
-            # Example invocation (optional, can be verbose)
-            # from langchain_core.messages import HumanMessage
-            # logger.info("Attempting a test invocation...")
-            # response = chat_model.invoke([HumanMessage(content="Hello! Give a very short reply.")])
-            # logger.info(f"Test invocation response: {response.content}")
         else:
             logger.error("Chat model could not be initialized in standalone test.")
     except Exception as e:
