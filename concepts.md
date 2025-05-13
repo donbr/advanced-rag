@@ -91,19 +91,6 @@ for doc in documents:
 *   **Why they're used:** They are crucial for semantic search. By converting both documents and queries into embeddings, we can find relevant documents by identifying those whose embeddings are "closest" in vector space to the query's embedding.
 *   **In this project:** We use OpenAI's `text-embedding-3-small` model to generate these embeddings.
 
-```mermaid
-graph TD
-    A[Text: "I loved John Wick"] --> B[Embedding Model]
-    B --> C["Vector: [0.12, -0.33, 0.57, ...]"]
-    D[Text: "The movie was great"] --> B
-    B --> E["Vector: [0.15, -0.30, 0.52, ...]"]
-    F[Text: "I disliked the film"] --> B
-    B --> G["Vector: [-0.45, 0.28, -0.12, ...]"]
-    C -.-> |"Similar"| E
-    C -.-> |"Different"| G
-    E -.-> |"Different"| G
-```
-
 **Simplified Code Example:**
 ```python
 # This is a simplified version of what happens in embeddings.py
