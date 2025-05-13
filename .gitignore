@@ -1,0 +1,37 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+.venv
+venv/
+ENV/
+env/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Downloaded data files (from data_loader.py)
+docs/
+# If you want to allow an empty docs directory to be committed (e.g., with a .gitkeep file)
+# but ignore its contents, you might use:
+# docs/*
+# !docs/.gitkeep
+
+# Log files
+*.log
+logs/ # Ignore the entire logs directory
+
+# VS Code settings
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
