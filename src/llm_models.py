@@ -8,9 +8,9 @@ logger = logging.getLogger(__name__)
 # settings.setup_env_vars() # Called when settings is imported
 
 def get_chat_model():
-    logger.info("Initializing ChatOpenAI model (default: gpt-3.5-turbo)...")
+    logger.info("Initializing ChatOpenAI model (default: gpt-4.1-mini)...")
     try:
-        model = ChatOpenAI(model="gpt-4.1-nano")
+        model = ChatOpenAI(model="gpt-4.1-mini")
         logger.info(f"ChatOpenAI model initialized successfully: {model.model_name}")
         return model
     except Exception as e:

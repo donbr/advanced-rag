@@ -1,0 +1,15 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# MCP Tooling Requirement
+
+When diagnosing issues, adding features, or writing documentation **you must ground your work with the official Model Context Protocol tooling and docs**.
+
+* Always query the `ai-docs-server` sources (e.g. `MCPProtocol`, `MCPProtocolFull`) before making protocol-related changes or assumptions.
+* Use the MCP SDK (`mcp` ≥ 1.9.3) and its built-in CLI utilities (`mcp dev`, `mcp run`, etc.) to inspect and validate servers.
+* Cite specification links from `modelcontextprotocol.io` or the PyPI package page <https://pypi.org/project/mcp/> when referencing protocol behavior.
+* For code that exposes or consumes MCP primitives (servers, clients, tools, resources, prompts), prefer the high-level `mcp.server.fastmcp.FastMCP` and related helpers over custom protocol handling.
+
+Following these practices ensures the codebase stays aligned with the evolving MCP spec and tooling ecosystem.

@@ -166,7 +166,7 @@ graph_retriever = KnowledgeGraphRetriever(
     Given the question: {query}
     Generate a Cypher query to retrieve relevant information from the knowledge graph.
     """,
-    llm=ChatOpenAI(model="gpt-4o")
+    llm=ChatOpenAI(model="gpt-4.1-mini")
 )
 
 # Get graph-based context
@@ -492,7 +492,7 @@ evaluation_suite = RAGEvaluationSuite(
         hallucination_score,
         context_efficiency
     ],
-    llm_evaluator="gpt-4o"  # Using advanced LLM as judge
+    llm_evaluator="gpt-4.1-mini"  # Using advanced LLM as judge
 )
 
 # Run evaluation
@@ -558,7 +558,7 @@ from langchain.document_processors import ImageTextExtractor, VideoFrameExtracto
 
 # Initialize multimodal embedding model
 mm_embeddings = MultiModalEmbeddings(
-    text_model="text-embedding-3-large",
+    text_model="text-embedding-3-small",
     image_model="clip-vit-large-patch14-336",
     fusion_method="weighted_sum"  # How to combine text and image embeddings
 )
@@ -598,7 +598,7 @@ from langchain.chains import MultiModalRAGChain
 # Create a multimodal RAG chain
 mm_chain = MultiModalRAGChain(
     retriever=mm_retriever,
-    llm=ChatOpenAI(model="gpt-4o"),  # Using a multimodal LLM
+    llm=ChatOpenAI(model="gpt-4.1-mini"),  # Using a multimodal LLM
     prompt_template="""
     Answer the question based on the following context which may include text, 
     images, or video content. Describe any visual content that's relevant to the answer.

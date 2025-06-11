@@ -16,4 +16,14 @@ dependencies = [
     "fastapi>=0.115.12",
     "uvicorn>=0.34.2",
     "python-dotenv>=0.21.0",
+    "mcp[cli]>=1.9.3",
+]
+
+[project.optional-dependencies]
+# Development and test utilities
+# These are NOT required in production, but are handy for running linting and the test-suite.
+
+dev = [
+    "pytest>=8.3.4",
+    "pytest-asyncio>=1.0.0",
 ]

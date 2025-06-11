@@ -157,6 +157,42 @@ Once the setup is complete, you can run the FastAPI application.
     The server will typically start on `http://127.0.0.1:8000`.
     The `--reload` flag with `uvicorn` enables auto-reloading when code changes are detected, which is useful for development.
 
+## Running the MCP Server (Model Context Protocol)
+
+In addition to the REST API, this project now ships with an **MCP server** that exposes the same retrieval chains as first-class MCP **tools**.  This allows you to connect the retrievers to any MCP-aware client (e.g. Claude Desktop) or inspect them via the `mcp` CLI.
+
+### 1. Install the MCP SDK dependency
+```
+uv pip install "mcp[cli]>=1.4.1"   # Already specified in pyproject.toml, run sync if needed
+```
+
+### 2. Start the server (STDIO transport)
+```
+uv run src/mcp_server.py
+```
+The server communicates over standard input/output, which is the preferred transport for desktop clients.
+
+### 3. Inspect with MCP Inspector
+```
+mcp dev src/mcp_server.py            # Lists tools & lets you invoke them interactively
+```
+
+### 4. Claude Desktop integration
+Add a new entry to your `claude_desktop_config.json` (macOS path shown):
+```json
+{
+  "mcpServers": {
+    "advanced_rag": {
+      "command": "uv",
+      "args": ["run", "<absolute-path-to-project>/src/mcp_server.py"]
+    }
+  }
+}
+```
+After saving, restart Claude Desktop.  You should see seven tools (one per retriever) available.
+
+---
+
 ## Using the API Endpoints
 
 The FastAPI application exposes several endpoints, one for each retriever chain. You can interact with these using tools like `curl`, Postman, or any HTTP client.

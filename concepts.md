@@ -359,7 +359,7 @@ Different retrievers have distinct strengths and weaknesses. Here's a comparison
 
 *   **What they are:** The core AI component that understands and generates human-like text.
 *   **Role in RAG:** In our RAG pipeline, the LLM takes the user's original question *and* the relevant context retrieved by one of the retrievers. It then uses this information to generate a final answer.
-*   **In this project:** We use OpenAI's chat models (e.g., `gpt-3.5-turbo` by default via `ChatOpenAI()`).
+*   **In this project:** We use OpenAI's chat models (e.g., `gpt-4.1-mini` by default via `ChatOpenAI()`).
 
 **Simplified Code Example:**
 ```python
@@ -368,7 +368,7 @@ from langchain_openai import ChatOpenAI
 
 # Initialize the LLM
 llm = ChatOpenAI(
-    model="gpt-3.5-turbo",  # Specify which model to use
+    model="gpt-4.1-mini",  # Specify which model to use
     temperature=0.7  # Control randomness (higher = more creative)
 )
 

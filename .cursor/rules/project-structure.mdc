@@ -1,0 +1,33 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Advanced RAG Retriever – Project Structure Guide
+
+## Entry Points
+- [run.py](mdc:run.py) – CLI script that launches the FastAPI server defined in `src.main_api`.
+- [src/main_api.py](mdc:src/main_api.py) – Defines the `FastAPI` application and HTTP endpoints that wrap retrieval chains.
+- [src/mcp_server.py](mdc:src/mcp_server.py) – exposes the same retrieval chains as MCP tools via `FastMCP` (STDIO transport).
+
+## Chain & Retrieval Logic
+- [src/chain_factory.py](mdc:src/chain_factory.py) – Builds RAG chains around various retrievers and exposes constants (e.g., `NAIVE_RETRIEVAL_CHAIN`).
+- [src/retriever_factory.py](mdc:src/retriever_factory.py) – Constructs individual retrievers (BM25, Contextual Compression, etc.) and underlying vector stores.
+- [src/vectorstore_setup.py](mdc:src/vectorstore_setup.py) – Helper functions to create in-memory Qdrant vector stores and semantic chunks.
+
+## Data & Embeddings
+- [src/data_loader.py](mdc:src/data_loader.py) – Downloads John Wick review CSV files and converts them into LangChain `Document` objects.
+- [src/embeddings.py](mdc:src/embeddings.py) – Provides `OpenAIEmbeddings` model helper.
+
+## LLM / Chat Model
+- [src/llm_models.py](mdc:src/llm_models.py) – Instantiates the `ChatOpenAI` model used across chains.
+
+## Configuration & Logging
+- [src/settings.py](mdc:src/settings.py) – Loads environment variables and sets up keys for OpenAI, Cohere and LangSmith.
+- [src/logging_config.py](mdc:src/logging_config.py) – Configures console/file logging with filters and rotation.
+
+## Misc
+- `docs/` – CSV source files are placed here by `data_loader`.
+- `tests/` – (placeholder) test suite directory.
+
+Use this rule to quickly locate the relevant module when editing or extending application capabilities.
